@@ -25,6 +25,7 @@ public class RandImg {
         report(random.getClass().getSimpleName(), random::nextInt);
     }
 
+    // Code from https://www.javamex.com/tutorials/random_numbers/lcg_bit_positions.shtml
     private static void report(String name, Supplier<Integer> random) throws IOException {
         BufferedImage bimg = new BufferedImage(256, 256,
                 BufferedImage.TYPE_BYTE_BINARY);
