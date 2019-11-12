@@ -7,25 +7,34 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
+import java.util.SplittableRandom;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 
 public class RandImg {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        report("Random", new Random());
-        report("ThreadLocalRandom", ThreadLocalRandom.current());
-        report("SecureRandom", SecureRandom.getInstance("NativePRNGNonBlocking"));
+        report(new Random());
+        report(ThreadLocalRandom.current());
+        report(SecureRandom.getInstance("NativePRNGNonBlocking"));
+
+        SplittableRandom splittableRandom = new SplittableRandom();
+        report("SplittableRandom", splittableRandom::nextInt);
     }
 
-    private static void report(String name, Random random) throws IOException {
+    private static void report(Random random) throws IOException {
+        report(random.getClass().getSimpleName(), random::nextInt);
+    }
+
+    private static void report(String name, Supplier<Integer> random) throws IOException {
         BufferedImage bimg = new BufferedImage(256, 256,
                 BufferedImage.TYPE_BYTE_BINARY);
         int w = bimg.getWidth();
         for (int y = 0; y < bimg.getHeight(); y++) {
             for (int x = 0; x < w; x++) {
-                int bit = random.nextInt() & 1;
+                int bit = random.get() & 1;
                 bimg.setRGB(x, y, (bit == 0) ? 0 : 0xffffff);
             }
         }
-        ImageIO.write(bimg, "png", new File("out-" + random.getClass().getSimpleName() + ".png"));
+        ImageIO.write(bimg, "png", new File("out-" + name + ".png"));
     }
 }
